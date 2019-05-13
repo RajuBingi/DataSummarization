@@ -16,19 +16,19 @@ from matplotlib import pyplot as plt
 def BNPP1(inputfile):
 
 ###########################################################################################################################
-# This Program read the CSV file and generate the CSV file with three columns as per the document                         #
+# This Program reads the CSV file and generate the CSV file with three columns as per the document                         #
 # If input CSV file has errors then it prompts user   "Do you want to replace NULLs with 'No Name' string (y/n)"          #                                                                                           #   
 # If user says yes then program process the records by replacing NULL values with 'No Name' string                        #  
-# If user says No then it capture the errors with row numbers into  error_ouput.csv and does not generate the CSV file    #      
+# If user says No then it captures the errors with row numbers into  error_ouput.csv and does not generate the CSV file    #      
 #                                                                                                                         #  
 ###########################################################################################################################
     
     
-    if os.path.exists("outpufile/error_ouput.csv")  :      
-          os.remove("outpufile/error_ouput.csv")
+    if os.path.exists("outputfile/error_ouput.csv")  :      
+          os.remove("outputfile/error_ouput.csv")
 
-    if os.path.exists("outpufile/final_ouput.csv")  :      
-          os.remove("outpufile/final_ouput.csv")
+    if os.path.exists("outputfile/final_ouput.csv")  :      
+          os.remove("outputfile/final_ouput.csv")
     
     # Reading Data from CSV 
     df = pd.read_csv(inputfile, names=["time","message_identifier","sender","recipients","topic","mode"])
@@ -60,7 +60,7 @@ def BNPP1(inputfile):
     senders_df = pd.DataFrame(senders_list_count, columns=['Person','Sent'])
     
     
-    #Cleaning Recipients names and count of  recieved emails by person
+    #Cleaning Recipients names and count of  received emails by person
     recipients_list = getCleansingNames (list(df1['recipients']),'Y')
     
     
@@ -78,7 +78,7 @@ def BNPP1(inputfile):
     # Full Outer join of DF
     df_merge = pd.merge(senders_df,recipients_df,how='outer',on=['Person'])
     
-    # Replaccing NULLs with zero
+    # Replacing NULLs with zero
     final_df= df_merge.replace(np.nan, 0, regex=True)
     
     #Sorting by number of emails sent
@@ -92,7 +92,7 @@ def BNPP1(inputfile):
     
     if (source_records_count == final_df_count):
         #saving DF into File
-        final_df.to_csv("outpufile/final_ouput.csv", index = False)   
+        final_df.to_csv("outputfile/final_ouput.csv", index = False)   
     else:
        error_list = list(set(senders_error_list + recipients_error_list ))
        #print(error_list)
@@ -102,20 +102,20 @@ def BNPP1(inputfile):
          error_record = df.iloc[[row-1],[0,1,2,3,4,5]]
          print(error_record)
         
-         if not os.path.exists("outpufile/error_ouput.csv") :
+         if not os.path.exists("outputfile/error_ouput.csv") :
            error = []
            df_file = pd.DataFrame(error, columns=["time","message_identifier","sender","recipients","topic","mode"])
-           df_file.to_csv("outpufile/error_ouput.csv",index=False)
+           df_file.to_csv("outputfile/error_ouput.csv",index=False)
            
-           error_record.to_csv("outpufile/error_ouput.csv", header=False, mode='a') 
+           error_record.to_csv("outputfile/error_ouput.csv", header=False, mode='a') 
          else:
-           error_record.to_csv("outpufile/error_ouput.csv",header=False,  mode='a')
+           error_record.to_csv("outputfile/error_ouput.csv",header=False,  mode='a')
          
        
        
        print('records need to be coprrected. Please check th error file')
     
-    return 0 if os.path.exists("outpufile/final_ouput.csv") else 1
+    return 0 if os.path.exists("outputfile/final_ouput.csv") else 1
 
 def BNPP2(inputfile):
    
@@ -123,9 +123,9 @@ def BNPP2(inputfile):
     df = pd.read_csv(inputfile, names=["time","message_identifier","sender","recipients","topic","mode"])
     
     # Reading CSV file
-    df1 = pd.read_csv("outpufile/final_ouput.csv")
+    df1 = pd.read_csv("outputfile/final_ouput.csv")
     
-    # find top 5 pesrsons
+    # find top 5 persons
     top5senders = df1['Person'].head(5)
     
     #print (top5senders)
@@ -137,15 +137,15 @@ def BNPP2(inputfile):
     # Cleaning sender Names            
     df2['person']  = getCleansingNames((df2['sender']),'Y')[0]
     
-    #Clening Time
+    #Cleaning Time
     df2['date'] = pd.to_datetime(df2['time'], unit='ms').dt.strftime('%Y-%m') 
     
-    # Cleansed Recipoents List
+    # Cleansed Receipents List
     df2['cleanedRecip']  = df2.apply(lambda row : getCleansingNames(row['recipients'],'N')[0], axis=1)
     
     
     
-    ##############################################  Visualisation 1  ###############################
+    ##############################################  Visualization 1  ###############################
     # selecting only Date and person name
     df3 = df2[["date","person"]]
     
@@ -177,7 +177,7 @@ def BNPP2(inputfile):
     
     
     
-    #################################################### Visualisation 2  ##########################
+    #################################################### Visualization 2  ##########################
     
     # selecting only Date and person name
     df5 = df2[["date","person","cleanedRecip"]]
